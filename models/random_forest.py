@@ -1,41 +1,50 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import recall_score
 import joblib
 import os
+import pathlib
+
+model_path = 'random_forest_model.h5'
 
 # Load the dataset
 # Replace 'your_dataset.csv' with the actual dataset file path
 data = pd.read_parquet('dataset_processed.parquet')
 
 # Define features (X) and target (y)
-X = data.drop(columns=['Radio'])  # Drop the target column
-y = data['Radio']  # Target column
+X = data.drop(columns=['radio'])  # Drop the target column
+y = data['radio']  # Target column
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize the RandomForestClassifier
-rf = RandomForestClassifier(n_estimators=100, random_state=42)  # You can adjust n_estimators as needed
+if not pathlib.Path(model_path).exists():
+    # Initialize the RandomForestClassifier
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)  # You can adjust n_estimators as needed
 
-# Train the model
-rf.fit(X_train, y_train)
+    # Train the model
+    rf.fit(X_train, y_train)
 
-# Save the trained model to an .h5 file
-model_path = 'random_forest_model.h5'
-joblib.dump(rf, model_path)
-print(f"Model saved to {os.path.abspath(model_path)}")
+    # Save the trained model to an .h5 file
+    joblib.dump(rf, model_path)
+    print(f"Model saved to {os.path.abspath(model_path)}")
+else:
+    # load model from file
+    rf = joblib.load(model_path)
 
 # Make predictions
 y_pred = rf.predict(X_test)
 
 # Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Model Accuracy: {accuracy:.2f}")
+accuracy = recall_score(y_test, y_pred, average='macro')
+print(f"Model Recall: {accuracy:.2f}")
 
 # Display statistics
 print("Statistics:")
 print(f"Number of training samples: {len(X_train)}")
 print(f"Number of testing samples: {len(X_test)}")
 print(f"Number of features: {X.shape[1]}")
+
+from common import finish_with_prediciton
+finish_with_prediciton(rf)
