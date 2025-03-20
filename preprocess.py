@@ -78,8 +78,6 @@ def preprocess(learning=True, input_file='dataset.parquet', output_file='dataset
         radio_type_encoder = LabelEncoder()
         train_data['radio'] = radio_type_encoder.fit_transform(train_data['radio'])
 
-    breakpoint()
-
     train_data.to_parquet(output_file)
 
 # Parse command-line arguments
@@ -97,11 +95,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--learning", 
-        type=bool, 
-        default=True, 
+        action='store_true',
         help="Whether to perform learning-specific preprocessing (default: True)."
     )
     args = parser.parse_args()
+    print(f"Learning mode: {args.learning}")
 
     preprocess(learning=args.learning, input_file=args.input_file, output_file=args.output_file)
-
