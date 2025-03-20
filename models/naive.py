@@ -39,3 +39,7 @@ print("Statistics:")
 print(f"Number of training samples: {len(X_train)}")
 print(f"Number of testing samples: {len(X_test)}")
 print(f"Number of features: {X.shape[1]}")
+
+
+from common import finish_with_prediciton
+finish_with_prediciton(nb)

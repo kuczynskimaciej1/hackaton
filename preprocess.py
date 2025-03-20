@@ -75,8 +75,18 @@ def preprocess(learning=True, input_file='dataset.parquet', output_file='dataset
 
     if learning:
         # Normalize radio type: automatically from enum string to float
-        radio_type_encoder = LabelEncoder()
-        train_data['radio'] = radio_type_encoder.fit_transform(train_data['radio'])
+        # radio_type_encoder = LabelEncoder()
+        transformation = {
+            'CDMA': 0,
+            'GSM': 1,
+            'LTE': 2,
+            'NR': 3,
+            'UMTS': 4
+        }
+        def transform_radio(radio):
+            return transformation[radio]
+
+        train_data['radio'] = train_data['radio'].apply(transform_radio)
 
     train_data.to_parquet(output_file)
 
