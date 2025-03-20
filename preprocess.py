@@ -5,6 +5,7 @@ from sklearn.metrics import recall_score
 from sklearn.preprocessing import LabelEncoder
 import sys
 import re
+from collections import Counter
 
 # Load data
 train_data = pd.read_parquet('dataset.parquet')
@@ -22,8 +23,14 @@ train_data = train_data[train_data['created_ts'] > 10000]
 train_data = train_data[train_data['updated_ts'] > 10000]
 
 # normalize created_ts column to have values between 0 and 1
-train_data['created_ts_n'] = (train_data['created_ts'] - train_data['created_ts'].min()) / (train_data['created_ts'].max() - train_data['created_ts'].min())
-train_data['updated_ts_n'] = (train_data['updated_ts'] - train_data['updated_ts'].min()) / (train_data['updated_ts'].max() - train_data['updated_ts'].min())
+train_data.loc[train_data['created_ts'] < 1207427978, 'created_ts'] = 1207427978
+train_data.loc[train_data['created_ts'] > 1750000000, 'created_ts'] = 1750000000
+train_data['created_ts_n'] = (train_data['created_ts'] - 1207427978) / (1750000000 - 1207427978)
+
+
+train_data.loc[train_data['updated_ts'] < 1691625603, 'updated_ts'] = 1691625603
+train_data.loc[train_data['updated_ts'] > 1750000000, 'updated_ts'] = 1750000000
+train_data['updated_ts_n'] = (train_data['updated_ts'] - 1691625603) / (1750000000 - 1691625603)
 
 # a function that takes string like "18°54'2"E 47°27'32"N" to get the first part
 # and convert coordinate to float like 18.900555555555556
@@ -57,5 +64,32 @@ train_data['lat'] = train_data['lonlat'].apply(lambda x: get_lonlat(x)[1])
 train_data['lon'] = train_data['lon'] / 180
 train_data['lat'] = train_data['lat'] / 90
 
+train_data.drop(columns=['lonlat', 'created', 'updated', 'updated_ts', 'created_ts'], inplace=True)
+
+
+train_data.loc[train_data['samples'] > 200, 'samples'] = 200
+train_data['samples'] = train_data['samples'] / 200
+
+
+train_data.loc[train_data['range'] > 100000, 'range'] = 100000
+train_data['range'] = train_data['range'] / 100000
+
+
+train_data.loc[train_data['range'] > 100000, 'range'] = 100000
+train_data['range'] = train_data['range'] / 100000
+
+
+train_data.loc[train_data['averageSignal'] > 0, 'averageSignal'] = 0
+train_data.loc[train_data['averageSignal'] < -100, 'averageSignal'] = -100
+train_data['averageSignal'] = train_data['averageSignal'] / -100
+
+
+# Normalize radio type: automatically from enum string to float
+radio_type_encoder = LabelEncoder()
+train_data['radio'] = radio_type_encoder.fit_transform(train_data['radio'])
+# train_data['radio'] = train_data['radio'] / train_data['radio'].max()
+
+
 
 train_data.to_parquet('dataset_processed.parquet')
+
