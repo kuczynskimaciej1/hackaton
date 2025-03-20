@@ -31,7 +31,7 @@ print(f"Model saved to {os.path.abspath(model_path)}")
 y_pred = nb.predict(X_test)
 
 # Evaluate the model
-recall_scr = recall_score(y_test, y_pred, average='micro')
+recall_scr = recall_score(y_test, y_pred, average='macro')
 print(f"Model Recall score: {recall_scr:.2f}")
 
 # Display statistics
