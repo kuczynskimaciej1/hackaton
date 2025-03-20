@@ -3,6 +3,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import recall_score
 from sklearn.preprocessing import LabelEncoder
+import sys
+
 
 # Load data
 train_data = pd.read_parquet('dataset.parquet')
@@ -10,6 +12,22 @@ train_data = pd.read_parquet('dataset.parquet')
 # Preprocessing
 train_data['created'] = pd.to_datetime(train_data['created'])
 train_data['updated'] = pd.to_datetime(train_data['updated'])
+
+import matplotlib.pyplot as plt
+
+# Plot number of lines over time
+train_data.set_index('created').resample('D').size().plot(label='Created', alpha=0.7)
+train_data.set_index('updated').resample('D').size().plot(label='Updated', alpha=0.7)
+
+plt.title('Number of Entries Over Time')
+plt.xlabel('Date')
+plt.ylabel('Count')
+plt.legend()
+plt.show()
+
+sys.exit(0)
+
+
 train_data['time_diff'] = (train_data['updated'] - train_data['created']).dt.total_seconds()
 
 # Parse lonlat into latitude and longitude
