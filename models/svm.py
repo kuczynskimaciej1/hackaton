@@ -57,10 +57,15 @@ print(f"Testing set size: {X_test.shape[0]}")
 param_grid = {
     'C': [0.1, 1, 10, 100],
     'gamma': [1, 0.1, 0.01, 0.001],
-    'kernel': ['rbf', 'poly', 'sigmoid']
+    'kernel': ['rbf'],
+    'class_weight': ['balanced', None]
 }
-grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, scoring='recall_macro')
+grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, scoring='recall_macro', n_jobs=4)
 grid.fit(X_train, y_train)
+
+# Print the best parameters found by the grid search
+print("Best parameters found by grid search:")
+print(grid.best_params_)
 
 # Save the trained model to an .h5 file
 model_path = 'svm_model.h5'
